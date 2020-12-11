@@ -17,11 +17,8 @@ public class DataRepository {
     private MutableLiveData<List<DataItem>> mldDataItemList = new MutableLiveData<>();
 
     public DataRepository() {
-    }
-
-    public void loadData(int page) {
         APIService apiService = RetroInstance.getRetroClient().create(APIService.class);
-        Call<DataResponse> data = apiService.getDataList(page);
+        Call<DataResponse> data = apiService.getDataList(1);
         data.enqueue(new Callback<DataResponse>() {
             @Override
             public void onResponse(Call<DataResponse> call, Response<DataResponse> response) {

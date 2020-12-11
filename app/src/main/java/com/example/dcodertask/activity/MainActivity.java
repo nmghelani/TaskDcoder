@@ -3,18 +3,15 @@ package com.example.dcodertask.activity;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.example.dcodertask.adapter.DataAdapter;
+import com.example.dcodertask.adapter.PagedDataAdapter;
 import com.example.dcodertask.databinding.ActivityMainBinding;
 import com.example.dcodertask.model.DataItem;
-import com.example.dcodertask.viewModel.DataViewModel;
-
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import com.example.dcodertask.viewModel.PagedDataViewModel;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,8 +19,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
     private ActivityMainBinding mActivityMainBinding;
     private Context mContext;
-    private DataViewModel dataViewModel;
-    private static int currentPageId = 1, MAX_PAGE = 7;
+    //    private DataViewModel dataViewModel;
+    private PagedDataViewModel pagedDataViewModel;
+    //    private static int currentPageId = 1, MAX_PAGE = 7;
+    private PagedList<DataItem> dataItemPagedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(mActivityMainBinding.getRoot());
         mContext = MainActivity.this;
 
-        DataAdapter mDataAdapter = new DataAdapter(mContext);
+        //region WITHOUT PAGING
+        /*DataAdapter mDataAdapter = new DataAdapter(mContext);
         mActivityMainBinding.rvData.setLayoutManager(new LinearLayoutManager(mContext));
         mActivityMainBinding.rvData.setAdapter(mDataAdapter);
 
@@ -53,6 +53,22 @@ public class MainActivity extends AppCompatActivity {
                 }
                 this.cancel();
             }
-        }, 4000, 4000);
+        }, 4000, 4000);*/
+        //endregion
+
+        //region WITH PAGING
+
+        pagedDataViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(PagedDataViewModel.class);
+        pagedDataViewModel.getLiveDataPagedList().observe(this, new Observer<PagedList<DataItem>>() {
+            @Override
+            public void onChanged(PagedList<DataItem> dataItems) {
+                dataItemPagedList = dataItems;
+                PagedDataAdapter pagedDataAdapter = new PagedDataAdapter(mContext);
+                pagedDataAdapter.submitList(dataItemPagedList);
+                mActivityMainBinding.rvData.setLayoutManager(new LinearLayoutManager(mContext));
+                mActivityMainBinding.rvData.setAdapter(pagedDataAdapter);
+            }
+        });
+        //endregion
     }
 }

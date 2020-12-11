@@ -21,7 +21,4 @@ public class DataViewModel extends ViewModel {
         return liveDataList;
     }
 
-    public void loadData(int page) {
-        dataRepository.loadData(page);
-    }
 }
