@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import com.example.dcodertask.databinding.ItemDataBinding;
 import com.example.dcodertask.model.DataItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -15,11 +16,15 @@ import androidx.recyclerview.widget.RecyclerView;
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataViewHolder> {
 
     private final Context mContext;
-    private final List<DataItem> dataItemList;
+    private List<DataItem> dataItemList = new ArrayList<>();
 
-    public DataAdapter(Context mContext, List<DataItem> dataItemList) {
+    public DataAdapter(Context mContext) {
         this.mContext = mContext;
-        this.dataItemList = dataItemList;
+    }
+
+    public void updateList(List<DataItem> newDataItemList) {
+        dataItemList.addAll(newDataItemList);
+        notifyDataSetChanged();
     }
 
     @NonNull

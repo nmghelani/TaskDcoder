@@ -3,6 +3,7 @@ package com.example.dcodertask.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+import java.util.Objects;
 
 public class DataItem {
 
@@ -88,5 +89,29 @@ public class DataItem {
 
     public String getUsername() {
         return username;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DataItem)) return false;
+        DataItem dataItem = (DataItem) o;
+        return isProject == dataItem.isProject &&
+                languageId == dataItem.languageId &&
+                Objects.equals(forks, dataItem.forks) &&
+                Objects.equals(createdAt, dataItem.createdAt) &&
+                Objects.equals(file, dataItem.file) &&
+                Objects.equals(description, dataItem.description) &&
+                Objects.equals(id, dataItem.id) &&
+                Objects.equals(stars, dataItem.stars) &&
+                Objects.equals(title, dataItem.title) &&
+                Objects.equals(tags, dataItem.tags) &&
+                Objects.equals(updatedAt, dataItem.updatedAt) &&
+                Objects.equals(username, dataItem.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(forks, createdAt, file, isProject, description, id, languageId, stars, title, tags, updatedAt, username);
     }
 }
