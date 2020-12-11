@@ -1,35 +1,33 @@
 package com.example.dcodertask.viewModel;
 
-import com.example.dcodertask.dataSource.DataItemDataSource;
+import android.app.Application;
+
 import com.example.dcodertask.dataSource.DataItemDataSourceFactory;
 import com.example.dcodertask.model.DataItem;
 import com.example.dcodertask.network.APIService;
 import com.example.dcodertask.network.RetroInstance;
-import com.example.dcodertask.repository.DataRepository;
 
-import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
-public class PagedDataViewModel extends ViewModel {
+public class PagedDataViewModel extends AndroidViewModel {
     private Executor executor;
     private LiveData<PagedList<DataItem>> dataItemLiveList;
 
-    public PagedDataViewModel() {
-
+    public PagedDataViewModel(@NonNull Application application) {
+        super(application);
         APIService apiService = RetroInstance.getRetroClient().create(APIService.class);
-        DataItemDataSourceFactory dataItemDataSourceFactory = new DataItemDataSourceFactory(apiService);
+        DataItemDataSourceFactory dataItemDataSourceFactory = new DataItemDataSourceFactory(application, apiService);
 
         PagedList.Config config = (new PagedList.Config.Builder())
                 .setEnablePlaceholders(true)
-                .setInitialLoadSizeHint(10)
-                .setPageSize(20)
+                .setInitialLoadSizeHint(2)
                 .setPrefetchDistance(4)
                 .build();
 

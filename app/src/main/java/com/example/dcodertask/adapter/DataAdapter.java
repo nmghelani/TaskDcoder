@@ -54,7 +54,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataViewHolder
         }
 
         public void bind(DataItem dataItem) {
-            mItemDataBinding.tvTitle.setText(dataItem.getTitle());
+//            mItemDataBinding.tvTitle.setText(dataItem.getTitle());
         }
     }
 }

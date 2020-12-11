@@ -55,7 +55,7 @@ public class DataItem {
         return file;
     }
 
-    public boolean isIsProject() {
+    public boolean isProject() {
         return isProject;
     }
 

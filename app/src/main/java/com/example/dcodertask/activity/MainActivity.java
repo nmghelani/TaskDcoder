@@ -2,7 +2,10 @@ package com.example.dcodertask.activity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 
+import com.example.dcodertask.R;
 import com.example.dcodertask.adapter.PagedDataAdapter;
 import com.example.dcodertask.databinding.ActivityMainBinding;
 import com.example.dcodertask.model.DataItem;
@@ -22,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     //    private DataViewModel dataViewModel;
     private PagedDataViewModel pagedDataViewModel;
     //    private static int currentPageId = 1, MAX_PAGE = 7;
-    private PagedList<DataItem> dataItemPagedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,18 +59,24 @@ public class MainActivity extends AppCompatActivity {
         //endregion
 
         //region WITH PAGING
-
-        pagedDataViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(PagedDataViewModel.class);
+        //For AndroidViewModel ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())
+        //For ViewModel new ViewModelProvider.NewInstanceFactory()
+        pagedDataViewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(PagedDataViewModel.class);
         pagedDataViewModel.getLiveDataPagedList().observe(this, new Observer<PagedList<DataItem>>() {
             @Override
             public void onChanged(PagedList<DataItem> dataItems) {
-                dataItemPagedList = dataItems;
                 PagedDataAdapter pagedDataAdapter = new PagedDataAdapter(mContext);
-                pagedDataAdapter.submitList(dataItemPagedList);
+                pagedDataAdapter.submitList(dataItems);
                 mActivityMainBinding.rvData.setLayoutManager(new LinearLayoutManager(mContext));
                 mActivityMainBinding.rvData.setAdapter(pagedDataAdapter);
             }
         });
         //endregion
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 }
