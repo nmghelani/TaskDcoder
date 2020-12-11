@@ -12,5 +12,6 @@
         android:icon="@mipmap/search"
         app:iconTint="@color/white"
         android:title="Search"
-        app:showAsAction="always" />
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
 </menu>

@@ -5,6 +5,12 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 public class DataItem {
 
     @SerializedName("forks")
@@ -35,7 +41,7 @@ public class DataItem {
     private String title;
 
     @SerializedName("tags")
-    private List<String> tags;
+    private List<String> tagList;
 
     @SerializedName("updatedAt")
     private String updatedAt;
@@ -79,8 +85,8 @@ public class DataItem {
         return title;
     }
 
-    public List<String> getTags() {
-        return tags;
+    public List<String> getTagList() {
+        return tagList;
     }
 
     public String getUpdatedAt() {
@@ -105,13 +111,8 @@ public class DataItem {
                 Objects.equals(id, dataItem.id) &&
                 Objects.equals(stars, dataItem.stars) &&
                 Objects.equals(title, dataItem.title) &&
-                Objects.equals(tags, dataItem.tags) &&
+                Objects.equals(tagList, dataItem.tagList) &&
                 Objects.equals(updatedAt, dataItem.updatedAt) &&
                 Objects.equals(username, dataItem.username);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(forks, createdAt, file, isProject, description, id, languageId, stars, title, tags, updatedAt, username);
     }
 }

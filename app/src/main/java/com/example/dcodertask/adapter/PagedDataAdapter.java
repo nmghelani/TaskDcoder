@@ -2,7 +2,6 @@ package com.example.dcodertask.adapter;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +16,10 @@ import com.example.dcodertask.databinding.DgDetailsBinding;
 import com.example.dcodertask.databinding.ItemDataBinding;
 import com.example.dcodertask.model.DataItem;
 import com.example.dcodertask.utils.AppMethods;
-
-import java.util.Collections;
+import com.example.dcodertask.viewModel.DataViewModel;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,10 +28,12 @@ public class PagedDataAdapter extends PagedListAdapter<DataItem, PagedDataAdapte
 
     private static final String TAG = PagedDataAdapter.class.getName();
     private final Context mContext;
+    private final DataViewModel dataViewModel;
 
-    public PagedDataAdapter(Context mContext) {
+    public PagedDataAdapter(Context mContext, DataViewModel dataViewModel) {
         super(CALLBACK);
         this.mContext = mContext;
+        this.dataViewModel = dataViewModel;
     }
 
     @NonNull
@@ -48,6 +46,7 @@ public class PagedDataAdapter extends PagedListAdapter<DataItem, PagedDataAdapte
     @Override
     public void onBindViewHolder(@NonNull DataViewHolder holder, int position) {
         DataItem dataItem = getItem(position);
+        dataViewModel.insert(dataItem);
         if (dataItem == null) {
             holder.showProgress();
         } else {
@@ -125,7 +124,7 @@ public class PagedDataAdapter extends PagedListAdapter<DataItem, PagedDataAdapte
                     detailsBinding.tvFork.setText(String.valueOf(dataItem.getForks().getNumber()));
 
                     StringBuilder tagString = null;
-                    for (String tag : dataItem.getTags()) {
+                    for (String tag : dataItem.getTagList()) {
                         if (tagString == null) {
                             tagString = new StringBuilder();
                             tagString.append(tag);

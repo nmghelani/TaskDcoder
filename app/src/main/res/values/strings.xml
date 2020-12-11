@@ -5,4 +5,6 @@
     <string name="file_details">File Details</string>
     <string name="project_name">Project Name</string>
     <string name="file_name">File Name</string>
+    <string name="projects"><u>Projects</u></string>
+    <string name="files"><u>Files</u></string>
 </resources>

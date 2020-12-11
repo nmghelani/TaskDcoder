@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.Service;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Window;
@@ -18,34 +21,57 @@ import androidx.core.content.ContextCompat;
 
 public class AppMethods {
 
-    public static SparseArray<String> languages;
+    private static SparseArray<String> languages;
     private static Dialog progressDialog;
 
     static {
         if (languages == null) {
             languages = new SparseArray<>();
             languages.put(4, "Java");
-            languages.put(7, "Cpp");
+            languages.put(7, "C++");
             languages.put(5, "Python2");
             languages.put(6, "C");
             languages.put(1035, "HTML");
             languages.put(1004, "Java");
             languages.put(1022, "Python3");
-            languages.put(1007, "CPP");
+            languages.put(1007, "C++");
             languages.put(1002, "VB. NET");
             languages.put(1001, "CSharp");
             languages.put(1005, "Python2");
             languages.put(1021, "NodeJS");
             languages.put(1006, "C Key");
             languages.put(1020, "SCHEME");
-            languages.put(24, "Python2");
+            languages.put(24, "Python3");
             languages.put(400, "HTML");
             languages.put(21, "Scala");
         }
     }
 
+    public static SparseArray<String> getLanguages() {
+        return languages;
+    }
+
     public static String getLanguage(int language_id) {
         return languages.get(language_id);
+    }
+
+    public static boolean isNetworkEnabled(Context mContext) {
+        if (mContext == null)
+            return false;
+        try {
+            ConnectivityManager connectManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = connectManager.getActiveNetworkInfo();
+            if (netInfo != null) {
+                if (netInfo.isConnected()) {
+                    Log.e("true", "isNetworkEnabled: ");
+                    return true;
+                }
+            }
+            Log.e("false", "isNetworkEnabled: ");
+        } catch (Exception ex) {
+            Log.e("false", "isNetworkEnabled: " + ex.getMessage());
+        }
+        return false;
     }
 
     public static void showProgressDialog(Context mContext) {
