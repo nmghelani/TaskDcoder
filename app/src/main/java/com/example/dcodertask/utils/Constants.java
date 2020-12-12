@@ -7,4 +7,5 @@ public class Constants {
         int FILE = 1;
         int BOTH = 2;
     }
+    public static final int TRUE = 1, FALSE = 0;
 }

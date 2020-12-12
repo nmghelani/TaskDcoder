@@ -42,12 +42,8 @@ public class DataViewModel extends AndroidViewModel {
         dataRepository.deleteAll();
     }
 
-    public List<Project> getProjectsByTitle(String titleQuery) {
-        return dataRepository.getProjectsByTitle(titleQuery);
-    }
-
-    public List<Project> getProjects(int isProject, List<Integer> languages) {
-        return dataRepository.getProjects(isProject, languages);
+    public List<Project> getProjects(String query, Integer isProject, List<Integer> languages) {
+        return dataRepository.getProjects(query, isProject, languages);
     }
 
 }

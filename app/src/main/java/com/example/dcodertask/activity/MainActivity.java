@@ -2,8 +2,12 @@ package com.example.dcodertask.activity;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -12,7 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.dcodertask.R;
 import com.example.dcodertask.adapter.DataAdapter;
@@ -22,6 +29,7 @@ import com.example.dcodertask.databinding.DgFilterBinding;
 import com.example.dcodertask.localDatabase.Project;
 import com.example.dcodertask.model.DataItem;
 import com.example.dcodertask.utils.AppMethods;
+import com.example.dcodertask.utils.Constants;
 import com.example.dcodertask.viewModel.DataViewModel;
 import com.example.dcodertask.viewModel.PagedDataViewModel;
 import com.google.android.material.checkbox.MaterialCheckBox;
@@ -33,6 +41,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.paging.PagedList;
@@ -48,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
     private PagedList<DataItem> dataItemList;
     private List<Project> projectList;
     private DataAdapter dataAdapter;
+    private PagedDataAdapter pagedDataAdapter;
+    private static MutableLiveData<Boolean> isFilterApplied = new MutableLiveData<>(false), isOnline = new MutableLiveData<>(false);
+    private Integer fltIsProject;
+    private ArrayList<Integer> fltLanguageIds = new ArrayList<>();
+    private String fltQuery;
     //    private static int currentPageId = 1, MAX_PAGE = 7;
 
     @Override
@@ -55,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mActivityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mActivityMainBinding.getRoot());
+        setTitle(R.string.main_activity_title);
         mContext = MainActivity.this;
 
         //region WITHOUT PAGING
@@ -86,78 +101,172 @@ public class MainActivity extends AppCompatActivity {
         //For AndroidViewModel ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())
         //For ViewModel new ViewModelProvider.NewInstanceFactory()
 
+        ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                super.onAvailable(network);
+                isOnline.postValue(true);
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                super.onLost(network);
+                isOnline.postValue(false);
+            }
+        };
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            connectivityManager.registerDefaultNetworkCallback(networkCallback);
+        } else {
+            NetworkRequest request = new NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build();
+            connectivityManager.registerNetworkCallback(request, networkCallback);
+        }
+
         dataViewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(DataViewModel.class);
-        if (AppMethods.isNetworkEnabled(mContext)) {
+
+        isOnline.observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean online) {
+                Toast.makeText(mContext, "HasInternet: " + online, Toast.LENGTH_SHORT).show();
+                reload();
+            }
+        });
+        //endregion
+
+        isFilterApplied.observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean applied) {
+                if (applied) {
+                    if (mActivityMainBinding.tvClearFilters.getVisibility() == View.GONE) {
+                        mActivityMainBinding.tvClearFilters.setVisibility(View.VISIBLE);
+                        mActivityMainBinding.tvClearFilters.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.zoom_in));
+                    }
+                } else {
+                    if (mActivityMainBinding.tvClearFilters.getVisibility() == View.VISIBLE) {
+                        mActivityMainBinding.tvClearFilters.setVisibility(View.GONE);
+                        mActivityMainBinding.tvClearFilters.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.zoom_out));
+                    }
+                }
+            }
+        });
+
+        mActivityMainBinding.tvClearFilters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isFilterApplied.postValue(false);
+                reload();
+            }
+        });
+    }
+
+    private void observeList() {
+        observeList(null, null, null);
+    }
+
+    private void observeList(String query, Integer isProject, List<Integer> languageIds) {
+        if (pagedDataViewModel == null) {
             pagedDataViewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(PagedDataViewModel.class);
+        }
+        pagedDataViewModel.startLoading(query, isProject, languageIds);
+        if (!pagedDataViewModel.getLiveDataPagedList().hasActiveObservers()) {
             pagedDataViewModel.getLiveDataPagedList().observe(this, new Observer<PagedList<DataItem>>() {
                 @Override
                 public void onChanged(PagedList<DataItem> dataItems) {
                     dataItemList = dataItems;
-                    PagedDataAdapter pagedDataAdapter = new PagedDataAdapter(mContext, dataViewModel);
+                    pagedDataAdapter = new PagedDataAdapter(mContext, dataViewModel);
                     pagedDataAdapter.submitList(dataItemList);
                     mActivityMainBinding.rvData.setLayoutManager(new LinearLayoutManager(mContext));
                     mActivityMainBinding.rvData.setAdapter(pagedDataAdapter);
                 }
             });
-        } else {
-            dataAdapter = new DataAdapter(mContext);
-            mActivityMainBinding.rvData.setLayoutManager(new LinearLayoutManager(mContext));
-            mActivityMainBinding.rvData.setAdapter(dataAdapter);
-
-            dataViewModel.getLiveDataList().observe(this, new Observer<List<Project>>() {
-                @Override
-                public void onChanged(List<Project> dataItemList) {
-                    projectList = dataItemList;
-                    if (dataAdapter != null) {
-                        dataAdapter.updateList(projectList);
-                    }
-                }
-            });
         }
-        //endregion
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.home, menu);
-        MenuItem menuItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) menuItem.getActionView();
+        MenuItem miFilter = menu.findItem(R.id.action_filter);
+        MenuItem miSearch = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) miSearch.getActionView();
         searchView.setQueryHint("Type to search");
+        miSearch.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                miFilter.setVisible(false);
+                mActivityMainBinding.tvClearFilters.performClick();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                miFilter.setVisible(true);
+                reload();
+                return true;
+            }
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (dataAdapter != null) {
-                    Log.d(TAG, "onQueryTextSubmit: ");
-                    projectList = dataViewModel.getProjectsByTitle(query);
-                    dataAdapter.submitList(projectList);
+                AppMethods.hideKeyboard(mContext);
+                if (isOnline.getValue()) {
+                    observeList(query, null, null);
+                } else {
+                    projectList = dataViewModel.getProjects(query, null, null);
+                    dataAdapter.setList(projectList);
                 }
-                return false;
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (dataAdapter != null && "".equals(newText)) {
-                    Log.d(TAG, "onQueryTextChange: ");
-                    projectList = dataViewModel.getProjectsByTitle("");
-                    dataAdapter.submitList(projectList);
-                }
-                return false;
+                return true;
             }
         });
         return super.onCreateOptionsMenu(menu);
     }
 
+    private void reload() {
+        if (isOnline.getValue()) {
+            observeList();
+        } else {
+            if (dataAdapter == null) {
+                dataAdapter = new DataAdapter(mContext);
+                mActivityMainBinding.rvData.setLayoutManager(new LinearLayoutManager(mContext));
+            }
+
+            if (!dataViewModel.getLiveDataList().hasActiveObservers()) {
+                dataViewModel.getLiveDataList().observe(this, new Observer<List<Project>>() {
+                    @Override
+                    public void onChanged(List<Project> dataItemList) {
+                        projectList = dataItemList;
+                        if (dataAdapter != null) {
+                            dataAdapter.updateList(projectList);
+                        }
+                    }
+                });
+            }
+
+            projectList = dataViewModel.getProjects(null, null, null);
+            mActivityMainBinding.rvData.setAdapter(dataAdapter);
+            dataAdapter.setList(projectList);
+        }
+        fltIsProject = null;
+        fltLanguageIds.clear();
+        isFilterApplied.postValue(false);
+        fltQuery = null;
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.filter:
+            case R.id.action_filter:
                 Dialog dgFilter = new Dialog(mContext);
                 DgFilterBinding filterBinding = DgFilterBinding.inflate(LayoutInflater.from(mContext));
                 dgFilter.setContentView(filterBinding.getRoot());
                 Window window = dgFilter.getWindow();
                 if (window != null) {
                     window.getAttributes().windowAnimations = R.style.BottomDialogAnimation;
-                    window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     window.setGravity(Gravity.BOTTOM);
                     window.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bg_details));
                 }
@@ -173,35 +282,78 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         filterBinding.llProjectLanguages.addView(materialCheckBox);
                     }
+                    if (fltLanguageIds != null && fltLanguageIds.contains(key)) {
+                        materialCheckBox.setChecked(true);
+                    }
                 }
+
+                CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (filterBinding.cbProject.isChecked() && !filterBinding.cbFiles.isChecked()) {
+                            filterBinding.llProjectLanguages.setVisibility(View.VISIBLE);
+                            filterBinding.llFilesLanguages.setVisibility(View.GONE);
+                        } else if (!filterBinding.cbProject.isChecked() && filterBinding.cbFiles.isChecked()) {
+                            filterBinding.llProjectLanguages.setVisibility(View.GONE);
+                            filterBinding.llFilesLanguages.setVisibility(View.VISIBLE);
+                        } else {
+                            filterBinding.llProjectLanguages.setVisibility(View.VISIBLE);
+                            filterBinding.llFilesLanguages.setVisibility(View.VISIBLE);
+                        }
+                    }
+                };
+
+                if (!AppMethods.isNullOrEmpty(fltQuery)) {
+                    filterBinding.searchView.setQuery(fltQuery, false);
+                }
+
+                filterBinding.cbFiles.setOnCheckedChangeListener(onCheckedChangeListener);
+                filterBinding.cbProject.setOnCheckedChangeListener(onCheckedChangeListener);
+
+                filterBinding.cbProject.setChecked(fltIsProject == null || fltIsProject == Constants.TRUE);
+                filterBinding.cbFiles.setChecked(fltIsProject == null || fltIsProject == Constants.FALSE);
+
                 filterBinding.btnOk.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        isFilterApplied.postValue(true);
                         dgFilter.dismiss();
-                        int isProject = 2;
+                        fltIsProject = null;
                         if (filterBinding.cbProject.isChecked() && !filterBinding.cbFiles.isChecked()) {
-                            isProject = 1;
+                            fltIsProject = 1;
                         } else if (!filterBinding.cbProject.isChecked() && filterBinding.cbFiles.isChecked()) {
-                            isProject = 0;
+                            fltIsProject = 0;
                         }
-                        List<Integer> languages = new ArrayList<>();
-                        for (int i = 0; i < filterBinding.llFilesLanguages.getChildCount(); i++) {
-                            View view = filterBinding.llFilesLanguages.getChildAt(i);
+
+                        fltLanguageIds.clear();
+                        int filesCnt = filterBinding.llFilesLanguages.getChildCount(), projectCnt = filterBinding.llProjectLanguages.getChildCount();
+                        for (int fileInx = 0, projectInx = 0; (filesCnt >= projectCnt) ? fileInx < filesCnt : projectInx < projectCnt; fileInx++, projectInx++) {
                             MaterialCheckBox materialCheckBox;
-                            if (view instanceof MaterialCheckBox && (materialCheckBox = (MaterialCheckBox) view).isChecked()) {
-                                languages.add(materialCheckBox.getId());
+                            if (fileInx < filesCnt) {
+                                View view = filterBinding.llFilesLanguages.getChildAt(fileInx);
+                                if (view instanceof MaterialCheckBox) {
+                                    materialCheckBox = (MaterialCheckBox) view;
+                                    if (materialCheckBox.isChecked()) {
+                                        fltLanguageIds.add(materialCheckBox.getId());
+                                    }
+                                }
+                            }
+                            View view = filterBinding.llProjectLanguages.getChildAt(projectInx);
+                            if (view instanceof MaterialCheckBox) {
+                                materialCheckBox = (MaterialCheckBox) view;
+                                if (materialCheckBox.isChecked()) {
+                                    fltLanguageIds.add(materialCheckBox.getId());
+                                }
                             }
                         }
-                        for (int i = 0; i < filterBinding.llProjectLanguages.getChildCount(); i++) {
-                            View view = filterBinding.llProjectLanguages.getChildAt(i);
-                            MaterialCheckBox materialCheckBox;
-                            if (view instanceof MaterialCheckBox && (materialCheckBox = (MaterialCheckBox) view).isChecked()) {
-                                languages.add(materialCheckBox.getId());
-                            }
+
+                        fltQuery = filterBinding.searchView.getQuery().toString();
+                        if (isOnline.getValue()) {
+                            observeList(fltQuery, fltIsProject, fltLanguageIds);
+                        } else {
+                            projectList = dataViewModel.getProjects(fltQuery, fltIsProject, fltLanguageIds);
+                            dataAdapter.setList(projectList);
                         }
-                        projectList = dataViewModel.getProjects(isProject, languages);
-                        Log.d(TAG, "onClick: " + projectList);
-                        dataAdapter.submitList(projectList);
                     }
                 });
                 dgFilter.show();

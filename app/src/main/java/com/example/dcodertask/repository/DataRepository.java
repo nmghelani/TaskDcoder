@@ -7,9 +7,9 @@ import com.example.dcodertask.localDatabase.DataItemDao;
 import com.example.dcodertask.localDatabase.Project;
 import com.example.dcodertask.localDatabase.ProjectDatabase;
 import com.example.dcodertask.model.DataItem;
+import com.example.dcodertask.utils.AppMethods;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -55,18 +55,9 @@ public class DataRepository {
         new DeleteAllAsyncTask(dataItemDao).execute();
     }
 
-    public List<Project> getProjectsByTitle(String titleQuery) {
+    public List<Project> getProjects(String query, Integer isProject, List<Integer> languageIds) {
         try {
-            return new GetProjectByTitle(dataItemDao).execute(titleQuery).get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-
-    public List<Project> getProjects(int isProject, List<Integer> languages) {
-        try {
-            return new GetProjects(dataItemDao).execute(Collections.singletonList(isProject), languages).get();
+            return new GetProjects(dataItemDao).execute(query, isProject, languageIds).get();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             return new ArrayList<>();
@@ -137,21 +128,7 @@ public class DataRepository {
         }
     }
 
-    public static class GetProjectByTitle extends AsyncTask<String, Void, List<Project>> {
-
-        private DataItemDao dataItemDao;
-
-        public GetProjectByTitle(DataItemDao dataItemDao) {
-            this.dataItemDao = dataItemDao;
-        }
-
-        @Override
-        protected List<Project> doInBackground(String... strings) {
-            return dataItemDao.getProjectsByTitle(strings[0]);
-        }
-    }
-
-    public static class GetProjects extends AsyncTask<List<Integer>, Void, List<Project>> {
+    public static class GetProjects extends AsyncTask<Object, Void, List<Project>> {
 
         private DataItemDao dataItemDao;
 
@@ -160,8 +137,11 @@ public class DataRepository {
         }
 
         @Override
-        protected List<Project> doInBackground(List<Integer>... integers) {
-            return dataItemDao.getProjects(integers[0].get(0), integers[1]);
+        protected List<Project> doInBackground(Object... objects) {
+            String query = objects[0] != null ? (String) objects[0] : "";
+            Integer isProject = (Integer) objects[1];
+            List<Integer> languageIds = (List<Integer>) objects[2];
+            return dataItemDao.getProjects(query, isProject, languageIds != null && !languageIds.isEmpty() ? languageIds : AppMethods.getLanguageIds());
         }
     }
 

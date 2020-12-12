@@ -39,7 +39,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.DataViewHolder
         notifyDataSetChanged();
     }
 
-    public void submitList(List<Project> newDataItemList) {
+    public void setList(List<Project> newDataItemList) {
         dataItemList = newDataItemList;
         notifyDataSetChanged();
     }

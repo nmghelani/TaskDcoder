@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/light_black"
+    android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvData"
-        tools:listitem="@layout/item_data"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_data" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/tvClearFilters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:background="@drawable/bg_language"
+        android:backgroundTint="@color/dark_grey"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_3sdp"
+        android:text="Clear Filters  X"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_13sdp"
+        android:textStyle="bold" />
+
+</FrameLayout>

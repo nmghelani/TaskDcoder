@@ -25,16 +25,12 @@ public interface DataItemDao {
     @Query("DELETE FROM project")
     void deleteAllProjects();
 
-    @Query("SELECT * FROM project ORDER BY id")
+    @Query("SELECT * FROM project")
     LiveData<List<Project>> getAllProjects();
 
-    @Query("SELECT * FROM project WHERE title LIKE '%' || :titleQuery || '%' " +
-            "OR description LIKE '%' || :titleQuery || '%'" +
-            "OR username LIKE '%' || :titleQuery || '%'" +
-            "OR file LIKE '%' || :titleQuery || '%'")
-    List<Project> getProjectsByTitle(String titleQuery);
-
-    @Query("SELECT * FROM project WHERE (isProject = CASE WHEN :isProject <> 2 THEN :isProject ELSE (isProject = 1 OR isProject = 2) END)" +
-            "AND (language_id IN (:languages))")
-    List<Project> getProjects(int isProject, List<Integer> languages);
+    @Query("SELECT * FROM project WHERE " +
+            "(title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR file LIKE '%' || :query || '%')" +
+            " AND CASE WHEN :isProject IS NULL THEN 1 ELSE isProject = :isProject END" +
+            " AND language_id IN (:languages)")
+    List<Project> getProjects(String query, Integer isProject, List<Integer> languages);
 }

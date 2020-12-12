@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/filter"
+        android:id="@+id/action_filter"
         android:icon="@mipmap/filter"
         app:iconTint="@color/white"
         android:title="Filter"
         app:showAsAction="always" />
     <item
-        android:id="@+id/search"
+        android:id="@+id/action_search"
         android:icon="@mipmap/search"
         app:iconTint="@color/white"
         android:title="Search"
