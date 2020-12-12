@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">File Locker</string>
+    <string name="app_name">Task DCoder</string>
     <string name="main_activity_title">HOME</string>
     <string name="more_details"><u>More Details</u></string>
     <string name="project_name">Project Name</string>
