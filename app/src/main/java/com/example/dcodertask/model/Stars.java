@@ -7,6 +7,10 @@ public class Stars {
     @SerializedName("number")
     private int number;
 
+    public Stars(int number) {
+        this.number = number;
+    }
+
     public int getNumber() {
         return number;
     }

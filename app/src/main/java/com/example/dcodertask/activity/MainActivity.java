@@ -22,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.dcodertask.R;
-import com.example.dcodertask.adapter.DataAdapter;
 import com.example.dcodertask.adapter.PagedDataAdapter;
 import com.example.dcodertask.databinding.ActivityMainBinding;
 import com.example.dcodertask.databinding.DgFilterBinding;
@@ -56,9 +55,8 @@ public class MainActivity extends AppCompatActivity {
     private PagedDataViewModel pagedDataViewModel;
     private PagedList<DataItem> dataItemList;
     private List<Project> projectList;
-    private DataAdapter dataAdapter;
     private PagedDataAdapter pagedDataAdapter;
-    private static MutableLiveData<Boolean> isFilterApplied = new MutableLiveData<>(false), isOnline = new MutableLiveData<>(false);
+    public static MutableLiveData<Boolean> isFilterApplied = new MutableLiveData<>(false), isOnline = new MutableLiveData<>(false);
     private Integer fltIsProject;
     private ArrayList<Integer> fltLanguageIds = new ArrayList<>();
     private String fltQuery;
@@ -127,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
         isOnline.observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean online) {
-                Toast.makeText(mContext, "HasInternet: " + online, Toast.LENGTH_SHORT).show();
                 reload();
             }
         });
@@ -208,12 +205,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 AppMethods.hideKeyboard(mContext);
-                if (isOnline.getValue()) {
-                    observeList(query, null, null);
-                } else {
-                    projectList = dataViewModel.getProjects(query, null, null);
-                    dataAdapter.setList(projectList);
-                }
+                observeList(query, null, null);
                 return true;
             }
 
@@ -226,30 +218,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void reload() {
-        if (isOnline.getValue()) {
-            observeList();
-        } else {
-            if (dataAdapter == null) {
-                dataAdapter = new DataAdapter(mContext);
-                mActivityMainBinding.rvData.setLayoutManager(new LinearLayoutManager(mContext));
-            }
+        observeList();
 
-            if (!dataViewModel.getLiveDataList().hasActiveObservers()) {
-                dataViewModel.getLiveDataList().observe(this, new Observer<List<Project>>() {
-                    @Override
-                    public void onChanged(List<Project> dataItemList) {
-                        projectList = dataItemList;
-                        if (dataAdapter != null) {
-                            dataAdapter.updateList(projectList);
-                        }
-                    }
-                });
-            }
-
-            projectList = dataViewModel.getProjects(null, null, null);
-            mActivityMainBinding.rvData.setAdapter(dataAdapter);
-            dataAdapter.setList(projectList);
-        }
         fltIsProject = null;
         fltLanguageIds.clear();
         isFilterApplied.postValue(false);
@@ -348,12 +318,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         fltQuery = filterBinding.searchView.getQuery().toString();
-                        if (isOnline.getValue()) {
-                            observeList(fltQuery, fltIsProject, fltLanguageIds);
-                        } else {
-                            projectList = dataViewModel.getProjects(fltQuery, fltIsProject, fltLanguageIds);
-                            dataAdapter.setList(projectList);
-                        }
+                        observeList(fltQuery, fltIsProject, fltLanguageIds);
                     }
                 });
                 dgFilter.show();

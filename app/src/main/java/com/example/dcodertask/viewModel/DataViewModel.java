@@ -42,7 +42,7 @@ public class DataViewModel extends AndroidViewModel {
         dataRepository.deleteAll();
     }
 
-    public List<Project> getProjects(String query, Integer isProject, List<Integer> languages) {
+    public List<DataItem> getProjects(String query, Integer isProject, List<Integer> languages) {
         return dataRepository.getProjects(query, isProject, languages);
     }
 

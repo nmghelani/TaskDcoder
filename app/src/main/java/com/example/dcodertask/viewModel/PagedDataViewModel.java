@@ -7,6 +7,7 @@ import com.example.dcodertask.dataSource.DataItemDataSourceFactory;
 import com.example.dcodertask.model.DataItem;
 import com.example.dcodertask.network.APIService;
 import com.example.dcodertask.network.RetroInstance;
+import com.example.dcodertask.utils.AppMethods;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -30,13 +31,14 @@ public class PagedDataViewModel extends AndroidViewModel {
 
     public void startLoading(String query, Integer isProject, List<Integer> languageIds) {
         APIService apiService = RetroInstance.getRetroClient().create(APIService.class);
-        DataItemDataSourceFactory dataItemDataSourceFactory = new DataItemDataSourceFactory(application, apiService, query, isProject, languageIds);
 
         PagedList.Config config = (new PagedList.Config.Builder())
                 .setEnablePlaceholders(true)
                 .setPrefetchDistance(6)
                 .setPageSize(DataItemDataSource.MAX_PAGE)
                 .build();
+
+        DataItemDataSourceFactory dataItemDataSourceFactory = new DataItemDataSourceFactory(application, apiService, query, isProject, languageIds);
 
         executor = Executors.newFixedThreadPool(5);
         dataItemLiveList = (new LivePagedListBuilder<>(dataItemDataSourceFactory, config))

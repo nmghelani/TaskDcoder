@@ -1,7 +1,10 @@
 package com.example.dcodertask.model;
 
+import com.example.dcodertask.localDatabase.Project;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,6 +51,22 @@ public class DataItem {
 
     @SerializedName("username")
     private String username;
+
+    public DataItem(Project project) {
+        forks = new Forks(project.getNo_of_forks());
+        createdAt = project.getCreatedAt();
+        file = project.getFile();
+        isProject = project.isProject();
+        description = project.getDescription();
+        id = project.getId();
+        languageId = project.getLanguageId();
+        stars = new Stars(project.getNo_of_stars());
+        title = project.getTitle();
+        tagList = new ArrayList<>();
+        Collections.addAll(tagList, project.getTags().split(","));
+        updatedAt = project.getUpdatedAt();
+        username = project.getUsername();
+    }
 
     public Forks getForks() {
         return forks;

@@ -33,4 +33,11 @@ public interface DataItemDao {
             " AND CASE WHEN :isProject IS NULL THEN 1 ELSE isProject = :isProject END" +
             " AND language_id IN (:languages)")
     List<Project> getProjects(String query, Integer isProject, List<Integer> languages);
+
+    @Query("SELECT * FROM project WHERE" +
+            " (title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR file LIKE '%' || :query || '%')" +
+            " AND CASE WHEN :isProject IS NULL THEN 1 ELSE isProject = :isProject END" +
+            " AND language_id IN (:languages)" +
+            " LIMIT ((:page-1)*:size),:size")
+    List<Project> getProjectsBySize(String query, Integer isProject, List<Integer> languages, int page, int size);
 }

@@ -2,6 +2,7 @@ package com.example.dcodertask.repository;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.dcodertask.localDatabase.DataItemDao;
 import com.example.dcodertask.localDatabase.Project;
@@ -15,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.paging.DataSource;
 
 public class DataRepository {
     private DataItemDao dataItemDao;
@@ -55,9 +57,18 @@ public class DataRepository {
         new DeleteAllAsyncTask(dataItemDao).execute();
     }
 
-    public List<Project> getProjects(String query, Integer isProject, List<Integer> languageIds) {
+    public List<DataItem> getProjects(String query, Integer isProject, List<Integer> languageIds) {
         try {
             return new GetProjects(dataItemDao).execute(query, isProject, languageIds).get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<DataItem> getProjectsBySize(String query, Integer isProject, List<Integer> languageIds, int page, int size) {
+        try {
+            return new GetProjectsBySize(dataItemDao).execute(query, isProject, languageIds, page, size).get();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             return new ArrayList<>();
@@ -128,7 +139,7 @@ public class DataRepository {
         }
     }
 
-    public static class GetProjects extends AsyncTask<Object, Void, List<Project>> {
+    public static class GetProjects extends AsyncTask<Object, Void, List<DataItem>> {
 
         private DataItemDao dataItemDao;
 
@@ -137,14 +148,43 @@ public class DataRepository {
         }
 
         @Override
-        protected List<Project> doInBackground(Object... objects) {
+        protected List<DataItem> doInBackground(Object... objects) {
             String query = objects[0] != null ? (String) objects[0] : "";
             Integer isProject = (Integer) objects[1];
             List<Integer> languageIds = (List<Integer>) objects[2];
-            return dataItemDao.getProjects(query, isProject, languageIds != null && !languageIds.isEmpty() ? languageIds : AppMethods.getLanguageIds());
+            List<Project> projectList = dataItemDao.getProjects(query, isProject, languageIds != null && !languageIds.isEmpty() ? languageIds : AppMethods.getLanguageIds());
+            List<DataItem> dataItemList = new ArrayList<>();
+            for (Project project : projectList) {
+                dataItemList.add(new DataItem(project));
+            }
+            return dataItemList;
         }
     }
 
+    public static class GetProjectsBySize extends AsyncTask<Object, Void, List<DataItem>> {
+
+        private final String TAG = this.getClass().getName();
+        private DataItemDao dataItemDao;
+
+        public GetProjectsBySize(DataItemDao dataItemDao) {
+            this.dataItemDao = dataItemDao;
+        }
+
+        @Override
+        protected List<DataItem> doInBackground(Object... objects) {
+            String query = objects[0] != null ? (String) objects[0] : "";
+            Integer isProject = (Integer) objects[1];
+            List<Integer> languageIds = (List<Integer>) objects[2];
+            int page = (int) objects[3];
+            int size = (int) objects[4];
+            List<Project> projectList = dataItemDao.getProjectsBySize(query, isProject, languageIds != null && !languageIds.isEmpty() ? languageIds : AppMethods.getLanguageIds(), page, size);
+            List<DataItem> dataItemList = new ArrayList<>();
+            for (Project project : projectList) {
+                dataItemList.add(new DataItem(project));
+            }
+            return dataItemList;
+        }
+    }
 
     public static Project getProject(DataItem dataItem) {
         StringBuilder tagString = null;
