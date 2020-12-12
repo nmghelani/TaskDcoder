@@ -19,7 +19,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 
 public class DataRepository {
-    private DataItemDao dataItemDao;
+    private final DataItemDao dataItemDao;
     private LiveData<List<Project>> mldDataItemList = new MutableLiveData<>();
 
     public DataRepository(Application application) {
@@ -81,7 +81,7 @@ public class DataRepository {
 
     public static class InsertDataItemAsyncTask extends AsyncTask<DataItem, Void, Void> {
 
-        private DataItemDao dataItemDao;
+        private final DataItemDao dataItemDao;
 
         public InsertDataItemAsyncTask(DataItemDao dataItemDao) {
             this.dataItemDao = dataItemDao;
@@ -96,7 +96,7 @@ public class DataRepository {
 
     public static class UpdateDataItemAsyncTask extends AsyncTask<DataItem, Void, Void> {
 
-        private DataItemDao dataItemDao;
+        private final DataItemDao dataItemDao;
 
         public UpdateDataItemAsyncTask(DataItemDao dataItemDao) {
             this.dataItemDao = dataItemDao;
@@ -111,7 +111,7 @@ public class DataRepository {
 
     public static class DeleteDataItemAsyncTask extends AsyncTask<DataItem, Void, Void> {
 
-        private DataItemDao dataItemDao;
+        private final DataItemDao dataItemDao;
 
         public DeleteDataItemAsyncTask(DataItemDao dataItemDao) {
             this.dataItemDao = dataItemDao;
@@ -126,7 +126,7 @@ public class DataRepository {
 
     public static class DeleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        private DataItemDao dataItemDao;
+        private final DataItemDao dataItemDao;
 
         public DeleteAllAsyncTask(DataItemDao dataItemDao) {
             this.dataItemDao = dataItemDao;
@@ -141,7 +141,7 @@ public class DataRepository {
 
     public static class GetProjects extends AsyncTask<Object, Void, List<DataItem>> {
 
-        private DataItemDao dataItemDao;
+        private final DataItemDao dataItemDao;
 
         public GetProjects(DataItemDao dataItemDao) {
             this.dataItemDao = dataItemDao;
@@ -164,7 +164,7 @@ public class DataRepository {
     public static class GetProjectsBySize extends AsyncTask<Object, Void, List<DataItem>> {
 
         private final String TAG = this.getClass().getName();
-        private DataItemDao dataItemDao;
+        private final DataItemDao dataItemDao;
 
         public GetProjectsBySize(DataItemDao dataItemDao) {
             this.dataItemDao = dataItemDao;

@@ -2,8 +2,6 @@
     <string name="app_name">File Locker</string>
     <string name="main_activity_title">HOME</string>
     <string name="more_details"><u>More Details</u></string>
-    <string name="project_details">Project Details</string>
-    <string name="file_details">File Details</string>
     <string name="project_name">Project Name</string>
     <string name="file_name">File Name</string>
     <string name="projects"><u>Projects</u></string>

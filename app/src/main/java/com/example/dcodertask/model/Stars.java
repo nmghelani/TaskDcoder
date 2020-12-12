@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class Stars {
 
     @SerializedName("number")
-    private int number;
+    private final int number;
 
     public Stars(int number) {
         this.number = number;

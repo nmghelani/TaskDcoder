@@ -28,7 +28,7 @@ public class DataItemDataSource extends PageKeyedDataSource<Integer, DataItem> {
     private final String query;
     private final Integer isProject;
     private final List<Integer> languageIds;
-    private APIService apiService;
+    private final APIService apiService;
     public static int MAX_PAGE = 10;
     public int FIRST_LOAD_CNT = 1;
     private final static int PAGE_SIZE = 10;

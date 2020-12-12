@@ -13,8 +13,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 public class DataViewModel extends AndroidViewModel {
-    private DataRepository dataRepository;
-    private LiveData<List<Project>> liveDataList;
+    private final DataRepository dataRepository;
+    private final LiveData<List<Project>> liveDataList;
 
     public DataViewModel(@NonNull Application application) {
         super(application);

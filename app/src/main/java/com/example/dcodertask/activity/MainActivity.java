@@ -19,13 +19,11 @@ import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.example.dcodertask.R;
 import com.example.dcodertask.adapter.PagedDataAdapter;
 import com.example.dcodertask.databinding.ActivityMainBinding;
 import com.example.dcodertask.databinding.DgFilterBinding;
-import com.example.dcodertask.localDatabase.Project;
 import com.example.dcodertask.model.DataItem;
 import com.example.dcodertask.utils.AppMethods;
 import com.example.dcodertask.utils.Constants;
@@ -54,13 +52,11 @@ public class MainActivity extends AppCompatActivity {
     private DataViewModel dataViewModel;
     private PagedDataViewModel pagedDataViewModel;
     private PagedList<DataItem> dataItemList;
-    private List<Project> projectList;
     private PagedDataAdapter pagedDataAdapter;
     public static MutableLiveData<Boolean> isFilterApplied = new MutableLiveData<>(false), isOnline = new MutableLiveData<>(false);
     private Integer fltIsProject;
-    private ArrayList<Integer> fltLanguageIds = new ArrayList<>();
+    private final ArrayList<Integer> fltLanguageIds = new ArrayList<>();
     private String fltQuery;
-    //    private static int currentPageId = 1, MAX_PAGE = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
                 reload();
             }
         });
-        //endregion
 
         isFilterApplied.observe(this, new Observer<Boolean>() {
             @Override
@@ -154,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 reload();
             }
         });
+        //endregion
     }
 
     private void observeList() {

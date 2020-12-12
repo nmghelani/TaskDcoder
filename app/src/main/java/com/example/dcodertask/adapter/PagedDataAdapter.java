@@ -56,7 +56,7 @@ public class PagedDataAdapter extends PagedListAdapter<DataItem, PagedDataAdapte
 
     public class DataViewHolder extends RecyclerView.ViewHolder {
 
-        private ItemDataBinding mItemDataBinding;
+        private final ItemDataBinding mItemDataBinding;
 
         public DataViewHolder(@NonNull ItemDataBinding mItemDataBinding) {
             super(mItemDataBinding.getRoot());

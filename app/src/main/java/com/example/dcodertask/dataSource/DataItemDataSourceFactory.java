@@ -17,8 +17,8 @@ public class DataItemDataSourceFactory extends DataSource.Factory<Integer, DataI
     private final Integer isProject;
     private final List<Integer> languageIds;
     private DataItemDataSource dataItemDataSource;
-    private APIService apiService;
-    private MutableLiveData<DataItemDataSource> mutableLiveData;
+    private final APIService apiService;
+    private final MutableLiveData<DataItemDataSource> mutableLiveData;
 
     public DataItemDataSourceFactory(Application application, APIService apiService, String query, Integer isProject, List<Integer> languageIds) {
         this.application = application;

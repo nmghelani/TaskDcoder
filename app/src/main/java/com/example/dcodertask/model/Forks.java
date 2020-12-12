@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class Forks {
 
     @SerializedName("number")
-    private int number;
+    private final int number;
 
     public Forks(int number) {
         this.number = number;

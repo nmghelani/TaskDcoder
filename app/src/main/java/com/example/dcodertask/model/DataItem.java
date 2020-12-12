@@ -17,40 +17,40 @@ import androidx.room.PrimaryKey;
 public class DataItem {
 
     @SerializedName("forks")
-    private Forks forks;
+    private final Forks forks;
 
     @SerializedName("createdAt")
-    private String createdAt;
+    private final String createdAt;
 
     @SerializedName("file")
-    private String file;
+    private final String file;
 
     @SerializedName("is_project")
-    private boolean isProject;
+    private final boolean isProject;
 
     @SerializedName("description")
-    private String description;
+    private final String description;
 
     @SerializedName("_id")
-    private String id;
+    private final String id;
 
     @SerializedName("language_id")
-    private int languageId;
+    private final int languageId;
 
     @SerializedName("stars")
-    private Stars stars;
+    private final Stars stars;
 
     @SerializedName("title")
-    private String title;
+    private final String title;
 
     @SerializedName("tags")
-    private List<String> tagList;
+    private final List<String> tagList;
 
     @SerializedName("updatedAt")
-    private String updatedAt;
+    private final String updatedAt;
 
     @SerializedName("username")
-    private String username;
+    private final String username;
 
     public DataItem(Project project) {
         forks = new Forks(project.getNo_of_forks());
