@@ -2,12 +2,12 @@ package com.example.dcodertask.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Stars {
+public class ValueObject {
 
     @SerializedName("number")
     private final int number;
 
-    public Stars(int number) {
+    public ValueObject(int number) {
         this.number = number;
     }
 

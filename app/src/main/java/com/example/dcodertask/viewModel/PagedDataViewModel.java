@@ -2,52 +2,72 @@ package com.example.dcodertask.viewModel;
 
 import android.app.Application;
 
-import com.example.dcodertask.dataSource.DataItemDataSource;
-import com.example.dcodertask.dataSource.DataItemDataSourceFactory;
 import com.example.dcodertask.model.DataItem;
-import com.example.dcodertask.network.APIService;
-import com.example.dcodertask.network.RetroInstance;
-import com.example.dcodertask.utils.AppMethods;
+import com.example.dcodertask.repository.DataRepository;
 
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.paging.LivePagedListBuilder;
+import androidx.lifecycle.MutableLiveData;
 import androidx.paging.PagedList;
 
 public class PagedDataViewModel extends AndroidViewModel {
     private final Application application;
-    private Executor executor;
-    private LiveData<PagedList<DataItem>> dataItemLiveList;
+    private DataRepository dataRepository;
 
     public PagedDataViewModel(@NonNull Application application) {
         super(application);
         this.application = application;
     }
 
-    public void startLoading(String query, Integer isProject, List<Integer> languageIds) {
-        APIService apiService = RetroInstance.getRetroClient().create(APIService.class);
+    public void startLoading() {
+        dataRepository = DataRepository.getInstance(application);
+        dataRepository.startLoading();
+    }
 
-        PagedList.Config config = (new PagedList.Config.Builder())
-                .setEnablePlaceholders(true)
-                .setPrefetchDistance(6)
-                .setPageSize(DataItemDataSource.MAX_PAGE)
-                .build();
-
-        DataItemDataSourceFactory dataItemDataSourceFactory = new DataItemDataSourceFactory(application, apiService, query, isProject, languageIds);
-
-        executor = Executors.newFixedThreadPool(5);
-        dataItemLiveList = (new LivePagedListBuilder<>(dataItemDataSourceFactory, config))
-                .setFetchExecutor(executor)
-                .build();
+    public MutableLiveData<Boolean> getIsFilterApplied() {
+        return dataRepository.getIsFilterApplied();
     }
 
     public LiveData<PagedList<DataItem>> getLiveDataPagedList() {
-        return dataItemLiveList;
+        return dataRepository.getDataItemLiveList();
     }
 
+    public void resetFilterVariable() {
+        dataRepository.resetFilterVariable();
+    }
+
+    public Integer getFltIsProject() {
+        return dataRepository.getFltIsProject();
+    }
+
+    public void addFltLanguage(int languageIds) {
+        dataRepository.addFltLanguage(languageIds);
+    }
+
+    public void clearFltLanguage() {
+        dataRepository.clearFltLanguage();
+    }
+
+    public void setFltIsProject(Integer fltIsProject) {
+        dataRepository.setFltIsProject(fltIsProject);
+    }
+
+    public ArrayList<Integer> getFltLanguageIds() {
+        return dataRepository.getFltLanguageIds();
+    }
+
+    public String getFltQuery() {
+        return dataRepository.getFltQuery();
+    }
+
+    public void setFltQuery(String fltQuery) {
+        dataRepository.setFltQuery(fltQuery);
+    }
+
+    public void reload() {
+        dataRepository.reload();
+    }
 }

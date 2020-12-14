@@ -1,8 +1,11 @@
 package com.example.dcodertask.localDatabase;
 
+import com.example.dcodertask.model.DataItem;
+
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -14,30 +17,23 @@ import androidx.room.Update;
 public interface DataItemDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(Project project);
+    void insert(DataItem project);
 
     @Update
-    void update(Project project);
+    void update(DataItem project);
 
     @Delete
-    void delete(Project project);
+    void delete(DataItem project);
 
-    @Query("DELETE FROM project")
+    @Query("DELETE FROM DataItem")
     void deleteAllProjects();
 
-    @Query("SELECT * FROM project")
-    LiveData<List<Project>> getAllProjects();
+    @Query("SELECT * FROM DataItem")
+    LiveData<List<DataItem>> getAllProjects();
 
-    @Query("SELECT * FROM project WHERE " +
+    @Query("SELECT * FROM DataItem WHERE " +
             "(title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR file LIKE '%' || :query || '%')" +
             " AND CASE WHEN :isProject IS NULL THEN 1 ELSE isProject = :isProject END" +
-            " AND language_id IN (:languages)")
-    List<Project> getProjects(String query, Integer isProject, List<Integer> languages);
-
-    @Query("SELECT * FROM project WHERE" +
-            " (title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR file LIKE '%' || :query || '%')" +
-            " AND CASE WHEN :isProject IS NULL THEN 1 ELSE isProject = :isProject END" +
-            " AND language_id IN (:languages)" +
-            " LIMIT ((:page-1)*:size),:size")
-    List<Project> getProjectsBySize(String query, Integer isProject, List<Integer> languages, int page, int size);
+            " AND languageId IN (:languages)")
+    DataSource.Factory<Integer, DataItem> getProjects(String query, Integer isProject, List<Integer> languages);
 }

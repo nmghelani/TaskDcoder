@@ -1,74 +1,109 @@
 package com.example.dcodertask.model;
 
-import com.example.dcodertask.localDatabase.Project;
+import com.example.dcodertask.localDatabase.DataConverter;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
+@Entity(tableName = "DataItem")
 public class DataItem {
 
+    @TypeConverters(DataConverter.class)
     @SerializedName("forks")
-    private final Forks forks;
+    private ValueObject forks;
 
     @SerializedName("createdAt")
-    private final String createdAt;
+    private String createdAt;
 
     @SerializedName("file")
-    private final String file;
+    private String file;
 
     @SerializedName("is_project")
-    private final boolean isProject;
+    private boolean isProject;
 
     @SerializedName("description")
-    private final String description;
+    private String description;
 
     @SerializedName("_id")
-    private final String id;
+    @NonNull
+    @PrimaryKey
+    private String id;
 
     @SerializedName("language_id")
-    private final int languageId;
+    private int languageId;
 
+    @TypeConverters(DataConverter.class)
     @SerializedName("stars")
-    private final Stars stars;
+    private ValueObject stars;
 
     @SerializedName("title")
-    private final String title;
+    private String title;
 
+    @TypeConverters(DataConverter.class)
     @SerializedName("tags")
-    private final List<String> tagList;
+    private List<String> tagList;
 
     @SerializedName("updatedAt")
-    private final String updatedAt;
+    private String updatedAt;
 
     @SerializedName("username")
-    private final String username;
+    private String username;
 
-    public DataItem(Project project) {
-        forks = new Forks(project.getNo_of_forks());
-        createdAt = project.getCreatedAt();
-        file = project.getFile();
-        isProject = project.isProject();
-        description = project.getDescription();
-        id = project.getId();
-        languageId = project.getLanguageId();
-        stars = new Stars(project.getNo_of_stars());
-        title = project.getTitle();
-        tagList = new ArrayList<>();
-        Collections.addAll(tagList, project.getTags().split(","));
-        updatedAt = project.getUpdatedAt();
-        username = project.getUsername();
+    public void setForks(ValueObject forks) {
+        this.forks = forks;
     }
 
-    public Forks getForks() {
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    public void setProject(boolean project) {
+        isProject = project;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setLanguageId(int languageId) {
+        this.languageId = languageId;
+    }
+
+    public void setStars(ValueObject stars) {
+        this.stars = stars;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setTagList(List<String> tagList) {
+        this.tagList = tagList;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public ValueObject getForks() {
         return forks;
     }
 
@@ -96,7 +131,7 @@ public class DataItem {
         return languageId;
     }
 
-    public Stars getStars() {
+    public ValueObject getStars() {
         return stars;
     }
 
@@ -127,11 +162,32 @@ public class DataItem {
                 Objects.equals(createdAt, dataItem.createdAt) &&
                 Objects.equals(file, dataItem.file) &&
                 Objects.equals(description, dataItem.description) &&
-                Objects.equals(id, dataItem.id) &&
+                id.equals(dataItem.id) &&
                 Objects.equals(stars, dataItem.stars) &&
                 Objects.equals(title, dataItem.title) &&
                 Objects.equals(tagList, dataItem.tagList) &&
                 Objects.equals(updatedAt, dataItem.updatedAt) &&
                 Objects.equals(username, dataItem.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(forks, createdAt, file, isProject, description, id, languageId, stars, title, tagList, updatedAt, username);
+    }
+
+    public String getTags() {
+        StringBuilder tagString = null;
+        for (String tag : tagList) {
+            if (tagString == null) {
+                tagString = new StringBuilder();
+                tagString.append(tag);
+            } else {
+                tagString.append(", ").append(tag);
+            }
+        }
+        if (tagString == null) {
+            tagString = new StringBuilder();
+        }
+        return tagString.toString();
     }
 }

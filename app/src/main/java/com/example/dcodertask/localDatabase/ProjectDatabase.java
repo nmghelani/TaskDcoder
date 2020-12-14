@@ -2,13 +2,15 @@ package com.example.dcodertask.localDatabase;
 
 import android.content.Context;
 
+import com.example.dcodertask.model.DataItem;
+
 import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Project.class}, version = 1)
+@Database(entities = {DataItem.class}, version = 1)
 public abstract class ProjectDatabase extends RoomDatabase {
 
     private static ProjectDatabase instance;

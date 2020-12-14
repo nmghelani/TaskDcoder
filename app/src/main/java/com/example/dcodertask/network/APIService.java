@@ -8,6 +8,6 @@ import retrofit2.http.Path;
 
 public interface APIService {
 
-    @GET("data/{id}")
-    Call<DataResponse> getDataList(@Path("id") int pageId);
+    @GET("data/{page}")
+    Call<DataResponse> getDataList(@Path("page") int page);
 }

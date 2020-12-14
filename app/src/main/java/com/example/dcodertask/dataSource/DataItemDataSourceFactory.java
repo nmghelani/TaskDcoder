@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.example.dcodertask.model.DataItem;
 import com.example.dcodertask.network.APIService;
+import com.example.dcodertask.network.RetroInstance;
 
 import java.util.List;
 
@@ -17,12 +18,10 @@ public class DataItemDataSourceFactory extends DataSource.Factory<Integer, DataI
     private final Integer isProject;
     private final List<Integer> languageIds;
     private DataItemDataSource dataItemDataSource;
-    private final APIService apiService;
     private final MutableLiveData<DataItemDataSource> mutableLiveData;
 
-    public DataItemDataSourceFactory(Application application, APIService apiService, String query, Integer isProject, List<Integer> languageIds) {
+    public DataItemDataSourceFactory(Application application, String query, Integer isProject, List<Integer> languageIds) {
         this.application = application;
-        this.apiService = apiService;
         this.query = query;
         this.isProject = isProject;
         this.languageIds = languageIds;
@@ -32,7 +31,7 @@ public class DataItemDataSourceFactory extends DataSource.Factory<Integer, DataI
     @NonNull
     @Override
     public DataSource<Integer, DataItem> create() {
-        dataItemDataSource = new DataItemDataSource(application, apiService, query, isProject, languageIds);
+        dataItemDataSource = new DataItemDataSource(application, query, isProject, languageIds);
         mutableLiveData.postValue(dataItemDataSource);
         return dataItemDataSource;
     }
